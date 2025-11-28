@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Suxrob Rajabov | Kiberxavfsizlik Muhandisi</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+  <style>
+    :root { --bg:#0f172a; --bg2:#1e293b; --text:#e2e8f0; --accent:#00d4ff; --accent2:#00ff9d; }
+    [data-theme="light"] { --bg:#f8fafc; --bg2:#e2e8f0; --text:#0f172a; --accent:#0066ff; --accent2:#00aa72; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; transition:all .4s; position:relative; overflow-x:hidden; }
+    h1,h2,h3 { font-family:'JetBrains Mono',monospace; }
+
+    /* Matrix Rain */
+    canvas#matrix-canvas { position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1; opacity:0.15; pointer-events:none; }
+    [data-theme="light"] canvas#matrix-canvas { opacity:0.05; }
+
+    nav { position:fixed; top:0; width:100%; padding:1rem 5%; background:rgba(15,23,42,0.9); backdrop-filter:blur(10px); z-index:1000;
+      display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(0,212,255,0.2); }
+    [data-theme="light"] nav { background:rgba(248,250,252,0.95); border-color:rgba(0,102,255,0.2); }
+    .logo { font-size:1.5rem; font-weight:700; color:var(--accent); }
+    .nav-links { display:flex; gap:2rem; align-items:center; flex-wrap:wrap; }
+    .nav-links a { color:var(--text); text-decoration:none; font-weight:500; transition:.3s; }
+    .nav-links a:hover { color:var(--accent); }
+    .controls { display:flex; gap:1rem; align-items:center; }
+    .theme-toggle, .lang-select { background:var(--bg2); border:none; color:var(--text); padding:.5rem 1rem; border-radius:8px; cursor:pointer; }
+
+    header { height:100vh; display:flex; align-items:center; justify-content:center; text-align:center; }
+    .hero h1 { font-size:4.5rem; background:linear-gradient(90deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .hero p { font-size:1.6rem; margin:1.5rem 0; opacity:0.9; }
+    .btn { padding:14px 36px; border:2px solid var(--accent); color:var(--accent); border-radius:8px; text-decoration:none; display:inline-block; transition:.4s; }
+    .btn:hover { background:var(--accent); color:#000; box-shadow:0 0 20px rgba(0,212,255,.5); }
+
+    section { padding:120px 10%; max-width:1400px; margin:0 auto; }
+    h2 { font-size:3rem; text-align:center; margin-bottom:4rem; background:linear-gradient(90deg,var(--accent),var(--accent2));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+
+    .about-container { display:grid; grid-template-columns:300px 1fr; gap:4rem; align-items:center; margin-top:3rem; }
+    .about-img { width:300px; height:300px; border-radius:50%; overflow:hidden; border:5px solid var(--accent); box-shadow:0 0 30px rgba(0,212,255,.4); }
+    .about-img img { width:100%; height:100%; object-fit:cover; }
+    .about-text .title { font-size:1.4rem; color:var(--accent); margin:1rem 0; display:block; }
+    .about-links a { color:var(--accent); font-size:1.8rem; transition:.3s; }
+    .about-links a:hover { color:var(--accent2); transform:translateY(-4px); }
+
+    i { transition:all .4s cubic-bezier(.68,-.55,.265,1.55); display:inline-block; }
+    i:hover { transform:translateY(-8px) rotate(8deg) scale(1.3); filter:drop-shadow(0 0 12px var(--accent)); }
+
+    .skills-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:2rem; }
+    .skill-card { background:var(--bg2); padding:2rem; border-radius:12px; border:1px solid rgba(0,212,255,.2); transition:.4s; cursor:pointer; }
+    .skill-card:hover { transform:translateY(-10px); border-color:var(--accent); box-shadow:0 10px 30px rgba(0,212,255,.2); }
+    .skill-card i { font-size:3rem; color:var(--accent); margin-bottom:1rem; }
+
+    .projects-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:2rem; }
+    .project { background:var(--bg2); padding:2rem; border-radius:12px; border:1px solid rgba(0,212,255,.2); transition:.4s; }
+    .project:hover { transform:translateY(-10px); border-color:var(--accent); }
+    .project-img { height:200px; background:linear-gradient(45deg,#1e293b,#334155); display:flex; align-items:center; justify-content:center; font-size:4rem; color:var(--accent); }
+
+    .contact-wrapper { display:grid; grid-template-columns:1fr 1fr; gap:4rem; margin-top:4rem; }
+    .contact-form-card, .contact-info-card { background:var(--bg2); padding:2.5rem; border-radius:16px; border:1px solid rgba(0,212,255,0.2); box-shadow:0 10px 30px rgba(0,0,0,0.3); }
+    .contact-form-card h3, .contact-info-card h3 { font-size:1.8rem; margin-bottom:2rem; color:var(--accent); text-align:center; }
+    .form-group { position:relative; margin-bottom:1.5rem; }
+    .form-group input, .form-group textarea { width:100%; padding:1rem 1rem 1rem 3rem; background:rgba(15,23,42,0.6); border:1px solid rgba(0,212,255,0.3); border-radius:12px; color:var(--text); transition:all .3s; }
+    .form-group input:focus, .form-group textarea:focus { outline:none; border-color:var(--accent); box-shadow:0 0 15px rgba(0,212,255,0.3); }
+    .form-group i { position:absolute; left:1rem; top:1.1rem; color:var(--accent); font-size:1.2rem; }
+    .submit-btn { width:100%; padding:1rem; font-size:1.1rem; display:flex; align-items:center; justify-content:center; gap:0.8rem; }
+    .submit-btn:hover span { transform:translateX(5px); }
+    .submit-btn:hover i { transform:translateX(8px); }
+    .contact-item { display:flex; align-items:center; gap:1rem; padding:1rem 0; border-bottom:1px dashed rgba(0,212,255,0.2); }
+    .contact-item:last-child { border-bottom:none; }
+    .contact-item i { font-size:2rem; color:var(--accent); width:50px; }
+    .contact-item a { color:var(--accent); text-decoration:none; }
+    .contact-item a:hover { text-decoration:underline; }
+    .work-hours { margin-top:3rem; padding:1.5rem; background:rgba(0,212,255,0.05); border-radius:12px; display:flex; align-items:center; gap:1rem; }
+    .work-hours i { font-size:1.8rem; color:var(--accent2); }
+
+    .telegram-chat { position:fixed; bottom:20px; right:20px; z-index:9999; background:var(--accent); color:#000; width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:2.2rem; box-shadow:0 10px 30px rgba(0,212,255,.5); cursor:pointer; animation:pulse 2s infinite; }
+    @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(0,212,255,.7)} 70%{box-shadow:0 0 0 15px rgba(0,212,255,0)} 100%{box-shadow:0 0 0 0 rgba(0,212,255,0)} }
+
+    /* Modal */
+    .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:9999; align-items:center; justify-content:center; padding:2rem; }
+    .modal.active { display:flex; }
+    .modal-content { background:var(--bg2); padding:3rem; border-radius:16px; max-width:700px; width:100%; border:2px solid var(--accent); position:relative; }
+    .modal-close { position:absolute; top:15px; right:20px; background:none; border:none; font-size:2rem; color:var(--text); cursor:pointer; }
+    .modal h3 { font-size:2.2rem; color:var(--accent2); margin-bottom:1.5rem; }
+    .modal p { line-height:1.8; font-size:1.1rem; }
+
+    footer { text-align:center; padding:3rem; background:#0a0e1a; font-family:'JetBrains Mono'; }
+    [data-theme="light"] footer { background:#e2e8f0; color:#0f172a; }
+
+    @media (max-width:900px) { .about-container, .contact-wrapper { grid-template-columns:1fr; text-align:center; } }
+    @media (max-width:768px) { .hero h1 { font-size:3rem; } }
+  </style>
+</head>
+<body data-theme="dark">
+
+<canvas id="matrix-canvas"></canvas>
+
+<a href="https://t.me/yourusername" target="_blank" class="telegram-chat">
+  <i class="fab fa-telegram-plane"></i>
+</a>
+
+<nav>
+  <div class="logo">Suxrob<span style="color:var(--accent2)">.dev</span></div>
+  <div class="nav-links">
+    <a href="#about" data-tr="about">Men haqimda</a>
+    <a href="#skills" data-tr="skills">Mutaxassislik</a>
+    <a href="#projects" data-tr="projects">Loyihalar</a>
+    <a href="#contact" data-tr="contact">Aloqa</a>
+  </div>
+  <div class="controls">
+    <button class="theme-toggle" id="themeToggle">Dark Mode</button>
+    <select class="lang-select" id="langSelect">
+      <option value="uz">O'zbek</option>
+      <option value="en">English</option>
+      <option value="ru">Русский</option>
+      <option value="tr">Türkçe</option>
+    </select>
+  </div>
+</nav>
+
+<header>
+  <div class="hero">
+    <h1 data-tr="heroTitle">SUXROB RAJABOV</h1>
+    <p data-tr="heroText">Men tarmoq va kiberxavfsizlik muhandisman.<br>Sizning infratuzilmangizni himoya qilaman.</p>
+    <a href="#about" class="btn" data-tr="heroBtn">Ko'proq bilish</a>
+  </div>
+</header>
+
+<section id="about">
+  <h2 data-tr="about">Men haqimda</h2>
+  <div class="about-container">
+    <div class="about-img">
+      <img src="/Users/Sarvar/Desktop/L/photo_2025-11-24_09-49-53.jpg" alt="Suxrob Rajabov">
+    </div>
+    <div class="about-text">
+      <h3>Salom, men Suxrob!</h3>
+      <span class="title" data-tr="jobTitle">Tarmoq va Kiberxavfsizlik muhandisi</span>
+      <p data-tr="bio1">7+ yillik tajribaga ega professionalman. Zero Trust, SIEM va cloud security loyihalarida ishladim.</p>
+      <p data-tr="bio2">Maqsadim – biznesingizni zamonaviy tahdidlardan himoya qilish.</p>
+      <div class="about-links">
+        <!-- <a href="https://t.me/yourusername"><i class="fab fa-telegram"></i></a>
+        <a href="https://linkedin.com/in/yourprofile"><i class="fab fa-linkedin"></i></a>
+        <a href="https://github.com/yourusername"><i class="fab fa-github"></i></a>
+        <a href="mailto:your@email.com"><i class="fas fa-envelope"></i></a> -->
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="skills" style="background:var(--bg2);">
+  <h2 data-tr="skills">Mutaxassislik yo'nalishlari</h2>
+  <div class="skills-grid">
+    <div class="skill-card" onclick="openModal('s1')"><i class="fas fa-network-wired"></i><h3 data-tr="s1">Tarmoq arxitekturasi</h3><p>Cisco, Juniper, SDN</p></div>
+    <div class="skill-card" onclick="openModal('s2')"><i class="fas fa-shield-alt"></i><h3 data-tr="s2">Firewall & IDS/IPS</h3><p>Palo Alto, FortiGate</p></div>
+    <div class="skill-card" onclick="openModal('s3')"><i class="fas fa-bug"></i><h3 data-tr="s3">Penetration Testing</h3><p>Kali, Metasploit</p></div>
+    <div class="skill-card" onclick="openModal('s4')"><i class="fas fa-chart-line"></i><h3 data-tr="s4">SIEM tizimlari</h3><p>Splunk, QRadar, ELK</p></div>
+    <div class="skill-card" onclick="openModal('s5')"><i class="fas fa-lock"></i><h3 data-tr="s5">Zero Trust</h3><p>Zscaler, Cloudflare</p></div>
+    <div class="skill-card" onclick="openModal('s6')"><i class="fas fa-cloud"></i><h3 data-tr="s6">Cloud Security</h3><p>AWS, Azure, GCP</p></div>
+  </div>
+</section>
+
+<!-- Modal -->
+<div class="modal" id="skillModal">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeModal()">X</button>
+    <h3 id="modalTitle"></h3>
+    <p id="modalDesc"></p>
+  </div>
+</div>
+
+<section id="projects">
+  <h2 data-tr="projects">Tanlangan loyihalar</h2>
+  <div class="projects-grid">
+    <div class="project">
+      <div class="project-img"><i class="fas fa-building"></i></div>
+      <div class="project-body">
+        <h3 data-tr="p1">Bank uchun Zero Trust tarmoq</h3>
+        <p data-tr="p1text">FortiGate + Zscaler orqali 3000+ foydalanuvchi uchun Zero Trust. Tashqi hujumlar 98% kamaydi.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <h2 data-tr="contact">Aloqa</h2>
+  <div class="contact-wrapper">
+    <div class="contact-form-card">
+      <h3 data-tr="contactFormTitle">Menga xabar yuboring</h3>
+      <form action="https://formspree.io/f/xanywjwd" method="POST">
+        <div class="form-group"><input type="text" name="name" placeholder="Ismingiz" data-tr-placeholder="name" required /><i class="fas fa-user"></i></div>
+        <div class="form-group"><input type="email" name="email" placeholder="Email" data-tr-placeholder="email" required /><i class="fas fa-envelope"></i></div>
+        <div class="form-group"><input type="text" name="subject" placeholder="Mavzu" data-tr-placeholder="subject" required /><i class="fas fa-tag"></i></div>
+        <div class="form-group"><textarea name="message" rows="6" placeholder="Xabar..." data-tr-placeholder="message" required></textarea><i class="fas fa-comment-dots"></i></div>
+        <button type="submit" class="btn submit-btn" data-tr="send"><span>Yuborish</span><i class="fas fa-paper-plane"></i></button>
+      </form>
+    </div>
+    <div class="contact-info-card">
+      <h3 data-tr="orwrite">To'g'ridan-to'g'ri yozing</h3>
+      <div class="contact-items">
+        <div class="contact-item"><i class="fab fa-telegram-plane"></i><div><strong>Telegram</strong><br><a href="https://t.me/iam_sukhrob"> Telegram</a></div></div>
+        <div class="contact-item"><i class="fab fa-linkedin"></i><div><strong>LinkedIn</strong><br><a href="https://linkedin.com/in/yourprofile">LinkedIn</a></div></div>
+        <div class="contact-item"><i class="fas fa-envelope"></i><div><strong>Email</strong><br><a href="sukhrobsobirovich2001@gmail.com">Gmail</a></div></div>
+        <div class="contact-item"><i class="fas fa-phone-alt"></i><div><strong>Telefon</strong><br><a href="tel:+998946460101">+998 94 646 01 01</a></div></div>
+      </div>
+      <div class="work-hours"><i class="fas fa-clock"></i><div><strong>Ish vaqti</strong><br>Dushanba — Juma: 09:00 — 18:00</div></div>
+    </div>
+  </div>
+</section>
+
+<footer>© 2025 Suxrob Rajabov</footer>
+
+<script>
+// To'liq tarjimalar (4 til)
+const translations = {
+  uz: { about:"Men haqimda", skills:"Mutaxassislik yo'nalishlari", projects:"Tanlangan loyihalar", contact:"Aloqa",
+    heroTitle:"SUXROB RAJABOV", heroText:"Men tarmoq va kiberxavfsizlik muhandisman.<br>Sizning infratuzilmangizni himoya qilaman.", heroBtn:"Ko'proq bilish",
+    jobTitle:"Tarmoq va Kiberxavfsizlik muhandisi", bio1:"2+ yillik tajribaga ega professionalman. Zero Trust, SIEM va cloud security loyihalarida ishladim.", bio2:"Maqsadim – biznesingizni zamonaviy tahdidlardan himoya qilish.",
+    s1:"Tarmoq arxitekturasi", s2:"Firewall & IDS/IPS", s3:"Penetration Testing", s4:"SIEM tizimlari", s5:"Zero Trust", s6:"Cloud Security",
+    p1:"Bank uchun Zero Trust tarmoq", p1text:"FortiGate + Zscaler orqali 3000+ foydalanuvchi uchun Zero Trust. Tashqi hujumlar 98% kamaydi.",
+    contactFormTitle:"Menga xabar yuboring", subject:"Mavzu", name:"Ismingiz", email:"Email", message:"Xabar yozing...", send:"Yuborish", orwrite:"To'g'ridan-to'g'ri yozing:",
+    modal_s1:"Katta korxonalar uchun yuqori ishonchli va samarali tarmoq arxitekturasi quraman. BGP, OSPF, VXLAN, SDN texnologiyalari bilan ishlayman.",
+    modal_s2:"Palo Alto, FortiGate, Check Point — firewall va IDS/IPS sozlamalari, siyosatlar yaratish va monitoring.",
+    modal_s3:"OWASP Top 10, Metasploit, Burp Suite bilan tizim zaifliklarini aniqlayman va yopaman.",
+    modal_s4:"Splunk, QRadar, Elastic Stack — loglarni yig'ish, korrelyatsiya qilish, real-time monitoring.",
+    modal_s5:"Zscaler, Cloudflare Zero Trust — foydalanuvchi va qurilmalarni doimiy tekshirish.",
+    modal_s6:"AWS, Azure, GCP da IAM, WAF, CSPM, encryption va compliance sozlamalari." },
+  en: { about:"About Me", skills:"Expertise", projects:"Projects", contact:"Contact",
+    heroTitle:"SUXROB RAJABOV", heroText:"Network & Cybersecurity Engineer.<br>I protect your infrastructure.", heroBtn:"Learn More",
+    jobTitle:"Network & Cybersecurity Engineer", bio1:"7+ years experienced professional. Worked on Zero Trust, SIEM and cloud security projects.", bio2:"My goal is to protect your business from modern threats.",
+    s1:"Network Architecture", s2:"Firewall & IDS/IPS", s3:"Penetration Testing", s4:"SIEM Systems", s5:"Zero Trust", s6:"Cloud Security",
+    p1:"Zero Trust Network for Bank", p1text:"Implemented Zero Trust for 3000+ users using FortiGate + Zscaler. External attacks reduced by 98%.",
+    contactFormTitle:"Send me a message", subject:"Subject", name:"Your Name", email:"Email", message:"Your message...", send:"Send", orwrite:"Or write directly:",
+    modal_s1:"Design high-reliability and efficient network architectures for enterprises. Work with BGP, OSPF, VXLAN, SDN.",
+    modal_s2:"Palo Alto, FortiGate, Check Point — firewall and IDS/IPS configuration, policy creation and monitoring.",
+    modal_s3:"Detect and close system vulnerabilities using OWASP Top 10, Metasploit, Burp Suite.",
+    modal_s4:"Splunk, QRadar, Elastic Stack — log collection, correlation, real-time monitoring.",
+    modal_s5:"Zscaler, Cloudflare Zero Trust — continuous user and device verification.",
+    modal_s6:"IAM, WAF, CSPM, encryption and compliance settings in AWS, Azure, GCP." },
+  ru: { about:"О себе", skills:"Компетенции", projects:"Проекты", contact:"Контакты",
+    heroTitle:"СУХРОБ РАДЖАБОВ", heroText:"Инженер сетей и кибербезопасности.<br>Защищаю вашу инфраструктуру.", heroBtn:"Узнать больше",
+    jobTitle:"Инженер сетей и кибербезопасности", bio1:"Профессионал с 7+ летним опытом. Работал над проектами Zero Trust, SIEM и облачной безопасности.", bio2:"Моя цель — защитить ваш бизнес от современных угроз.",
+    s1:"Сетевая архитектура", s2:"Firewall & IDS/IPS", s3:"Пентест", s4:"SIEM системы", s5:"Zero Trust", s6:"Cloud Security",
+    p1:"Zero Trust сеть для банка", p1text:"Внедрил Zero Trust для 3000+ пользователей (FortiGate + Zscaler). Внешние атаки сократились на 98%.",
+    contactFormTitle:"Напишите мне", subject:"Тема", name:"Ваше имя", email:"Email", message:"Ваше сообщение...", send:"Отправить", orwrite:"Или напишите напрямую:",
+    modal_s1:"Проектирую высоконадежные и эффективные сетевые архитектуры для крупных предприятий. Работаю с BGP, OSPF, VXLAN, SDN.",
+    modal_s2:"Palo Alto, FortiGate, Check Point — настройка firewall и IDS/IPS, создание политик и мониторинг.",
+    modal_s3:"Обнаруживаю и закрываю уязвимости систем с помощью OWASP Top 10, Metasploit, Burp Suite.",
+    modal_s4:"Splunk, QRadar, Elastic Stack — сбор логов, корреляция, мониторинг в реальном времени.",
+    modal_s5:"Zscaler, Cloudflare Zero Trust — постоянная проверка пользователей и устройств.",
+    modal_s6:"Настройка IAM, WAF, CSPM, шифрования и compliance в AWS, Azure, GCP." },
+  tr: { about:"Hakkımda", skills:"Uzmanlık Alanları", projects:"Projeler", contact:"İletişim",
+    heroTitle:"SUXROB RAJABOV", heroText:"Ağ ve Siber Güvenlik Mühendisi.<br>Altyapınızı koruyorum.", heroBtn:"Daha Fazla",
+    jobTitle:"Ağ ve Siber Güvenlik Mühendisi", bio1:"7+ yıl deneyimli profesyonelim. Zero Trust, SIEM ve bulut güvenliği projelerinde çalıştım.", bio2:"Amacım işinizi modern tehditlerden korumak.",
+    s1:"Ağ Mimarisi", s2:"Firewall & IDS/IPS", s3:"Sızma Testi", s4:"SIEM Sistemleri", s5:"Zero Trust", s6:"Bulut Güvenliği",
+    p1:"Banka için Zero Trust Ağı", p1text:"FortiGate + Zscaler ile 3000+ kullanıcı için Zero Trust. Dış saldırılar %98 azaldı.",
+    contactFormTitle:"Bana mesaj gönderin", subject:"Konu", name:"Adınız", email:"E-posta", message:"Mesajınız...", send:"Gönder", orwrite:"Ya da doğrudan yazın:",
+    modal_s1:"Büyük işletmeler için yüksek güvenilirlikte ve verimli ağ mimarileri tasarlıyorum. BGP, OSPF, VXLAN, SDN ile çalışıyorum.",
+    modal_s2:"Palo Alto, FortiGate, Check Point — firewall ve IDS/IPS yapılandırma, politika oluşturma ve izleme.",
+    modal_s3:"OWASP Top 10, Metasploit, Burp Suite ile sistem açıklarını tespit edip kapatıyorum.",
+    modal_s4:"Splunk, QRadar, Elastic Stack — log toplama, korelasyon, gerçek zamanlı izleme.",
+    modal_s5:"Zscaler, Cloudflare Zero Trust — kullanıcı ve cihazların sürekli doğrulanması.",
+    modal_s6:"AWS, Azure, GCP'de IAM, WAF, CSPM, şifreleme ve uyumluluk ayarları." }
+};
+
+// Til o'zgarishi
+document.getElementById('langSelect').addEventListener('change', e => {
+  const lang = e.target.value;
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-tr]').forEach(el => {
+    const key = el.dataset.tr;
+    if (translations[lang][key]) el.innerHTML = translations[lang][key];
+  });
+  document.querySelectorAll('[data-tr-placeholder]').forEach(el => {
+    const key = el.dataset.trPlaceholder;
+    if (translations[lang][key]) el.placeholder = translations[lang][key];
+  });
+  localStorage.setItem('lang', lang);
+});
+
+// Tema
+const themeToggle = document.getElementById('themeToggle');
+const savedTheme = localStorage.getItem('theme') || 'dark';
+document.body.dataset.theme = savedTheme;
+themeToggle.textContent = savedTheme === 'light' ? 'Light Mode' : 'Dark Mode';
+themeToggle.onclick = () => {
+  const newTheme = document.body.dataset.theme === 'light' ? 'dark' : 'light';
+  document.body.dataset.theme = newTheme;
+  localStorage.setItem('theme', newTheme);
+  themeToggle.textContent = newTheme === 'light' ? 'Light Mode' : 'Dark Mode';
+};
+
+// Modal
+function openModal(id) {
+  const lang = document.getElementById('langSelect').value;
+  document.getElementById('modalTitle').textContent = translations[lang][id];
+  document.getElementById('modalDesc').textContent = translations[lang]['modal_' + id] || translations.uz['modal_' + id];
+  document.getElementById('skillModal').classList.add('active');
+}
+function closeModal() {
+  document.getElementById('skillModal').classList.remove('active');
+}
+
+// Matrix Rain
+const canvas = document.getElementById('matrix-canvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+const letters = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+const fontSize = 14; let drops = [];
+function initDrops(){ const columns = canvas.width/fontSize; drops = Array(Math.floor(columns)).fill(1); }
+initDrops();
+function draw(){
+  ctx.fillStyle = document.body.dataset.theme === 'light' ? 'rgba(248,250,252,0.03)' : 'rgba(15,23,42,0.05)';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = document.body.dataset.theme === 'light' ? '#0066ff' : '#00d4ff';
+  ctx.font = fontSize + 'px JetBrains Mono';
+  for(let i=0;i<drops.length;i++){
+    const text = letters[Math.floor(Math.random()*letters.length)];
+    ctx.fillText(text,i*fontSize,drops[i]*fontSize);
+    if(drops[i]*fontSize>canvas.height && Math.random()>0.975) drops[i]=0;
+    drops[i]++;
+  }
+}
+setInterval(draw,35);
+window.addEventListener('resize',()=>{ canvas.width=window.innerWidth; canvas.height=window.innerHeight; initDrops(); });
+
+// Saqlangan til
+const savedLang = localStorage.getItem('lang') || 'uz';
+document.getElementById('langSelect').value = savedLang;
+document.getElementById('langSelect').dispatchEvent(new Event('change'));
+</script>
+</body>
+</html>
